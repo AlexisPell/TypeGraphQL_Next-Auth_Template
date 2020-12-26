@@ -21,12 +21,17 @@ export class User extends BaseEntity {
   lastName: string;
 
   @Field()
+  name(@Root() parent: User): string {
+    return `${parent.firstName} ${parent.lastName}`;
+  }
+
+  @Field()
   @Column('text', { unique: true })
   email: string;
 
-  @Field()
-  name: string;
-
   @Column()
   password: string;
+
+  @Column('bool', { default: false })
+  confirmed: boolean;
 }

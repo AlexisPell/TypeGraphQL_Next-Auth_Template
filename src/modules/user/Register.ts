@@ -1,28 +1,25 @@
-import { Arg, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
+import { Arg, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 import bcrypt from 'bcryptjs';
 
-import { User } from './../../entity/User';
+import { isAuth } from './../middleware/isAuth';
+import { logger } from './../middleware/logger';
 
-@Resolver(User) // Specified user to define type object for FieldResolver
+import { User } from './../../entity/User';
+import { RegisterInput } from './register/RegisterInput';
+import { sendEmail } from '../utils/sendEmail';
+
+import { createConfirmationUrl } from './../utils/createConfirmationUrl';
+
+@Resolver()
 export class RegisterResolver {
+  @UseMiddleware(isAuth, logger) // or @Authorized()
   @Query(() => String)
   async hello() {
     return 'Hello world!';
   }
 
-  @FieldResolver()
-  async name(@Root() parent: User) {
-    // Root is a parent of field resolver
-    return `${parent.firstName} ${parent.lastName}`;
-  }
-
   @Mutation(() => User)
-  async register(
-    @Arg('firstName') firstName: string,
-    @Arg('lastName') lastName: string,
-    @Arg('email') email: string,
-    @Arg('password') password: string
-  ): Promise<User> {
+  async register(@Arg('data') { firstName, lastName, email, password }: RegisterInput): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await User.create({
@@ -31,6 +28,8 @@ export class RegisterResolver {
       email,
       password: hashedPassword,
     }).save();
+
+    await sendEmail(email, await createConfirmationUrl(user.id));
 
     return user;
   }
