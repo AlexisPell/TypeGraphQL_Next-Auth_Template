@@ -2,11 +2,14 @@ import express from 'express';
 import dotenv from 'dotenv';
 import 'reflect-metadata';
 import 'colors';
-import { ApolloServer } from 'apollo-server-express';
 import { createConnection } from 'typeorm';
+import { ApolloServer } from 'apollo-server-express';
+import { graphqlUploadExpress } from 'graphql-upload';
+// import { fieldExtensionsEstimator, getComplexity, simpleEstimator } from 'graphql-query-complexity';
 
 // Dynamic imports
 import { createSchema } from './utils/createSchema';
+import { queryComplexityPlugin } from './utils/queryComplexity';
 
 // Session
 import cors from 'cors';
@@ -24,11 +27,20 @@ const startServer = async () => {
   const apolloServer = new ApolloServer({
     schema,
     context: ({ req, res }: any) => ({ req, res }),
+    uploads: false, // To enable graphql-upload working correct
+    plugins: [queryComplexityPlugin(schema)],
   });
 
   const app = express();
 
   const RedisStore = connectRedis(session);
+
+  app.use(
+    graphqlUploadExpress({
+      maxFileSize: 10000000,
+      maxFiles: 10,
+    })
+  );
 
   app.use(
     cors({
