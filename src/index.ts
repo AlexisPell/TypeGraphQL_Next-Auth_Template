@@ -3,8 +3,10 @@ import dotenv from 'dotenv';
 import 'reflect-metadata';
 import 'colors';
 import { ApolloServer } from 'apollo-server-express';
-import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
+
+// Dynamic imports
+import { createSchema } from './utils/createSchema';
 
 // Session
 import cors from 'cors';
@@ -18,11 +20,7 @@ dotenv.config({ path: 'config.env' });
 const startServer = async () => {
   await createConnection();
 
-  const schema = await buildSchema({
-    resolvers: [__dirname + '/modules/**/*.ts'],
-    authChecker: ({ context: { req } }) => !!req.session.userId,
-  });
-
+  const schema = await createSchema();
   const apolloServer = new ApolloServer({
     schema,
     context: ({ req, res }: any) => ({ req, res }),

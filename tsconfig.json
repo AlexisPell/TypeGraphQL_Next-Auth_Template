@@ -17,7 +17,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    // "noUnusedLocals": true,
+    "noUnusedLocals": true,
     // next 2 allows aviod `import * as entity from`
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
