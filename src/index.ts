@@ -64,7 +64,7 @@ const startServer = async () => {
     })
   );
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => {
