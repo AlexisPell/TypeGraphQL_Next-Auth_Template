@@ -7,6 +7,8 @@ import { ApolloServer } from 'apollo-server-express';
 import { graphqlUploadExpress } from 'graphql-upload';
 // import { fieldExtensionsEstimator, getComplexity, simpleEstimator } from 'graphql-query-complexity';
 
+// Checking git config
+
 // Dynamic imports
 import { createSchema } from './utils/createSchema';
 import { queryComplexityPlugin } from './utils/queryComplexity';
