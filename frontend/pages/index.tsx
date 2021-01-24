@@ -1,8 +1,10 @@
-import { gql } from 'apollo-boost';
 import Link from 'next/link';
-import * as React from 'react';
-import { Mutation } from 'react-apollo';
+import React from 'react';
 import Layout from '../components/Layout';
+
+import { Mutation } from 'react-apollo';
+import { loginMutation } from '../graphql/user/mutations/login';
+import { LoginMutation, LoginMutationVariables } from '../generated/apolloComponents';
 
 const IndexPage: React.FunctionComponent = () => {
   return (
@@ -13,27 +15,18 @@ const IndexPage: React.FunctionComponent = () => {
           <a>About</a>
         </Link>
       </p>
-      <Mutation
-        mutation={gql`
-          mutation {
-            login(email: "test@test.com", password: "qqq") {
-              id
-              firstName
-              lastName
-              email
-              name
-            }
-          }
-        `}
-      >
-        {(mutate: any) => (
+      {/*This is a working example without hooks*/}
+      <Mutation<LoginMutation, LoginMutationVariables> mutation={loginMutation}>
+        {(mutate) => (
           <button
             onClick={async () => {
-              const response = await mutate();
+              const response = await mutate({
+                variables: { email: 'bob17@gmail.com', password: '123123' },
+              });
               console.log(response);
             }}
           >
-            call login mutation
+            call login mutation <strong>without</strong> hook
           </button>
         )}
       </Mutation>
